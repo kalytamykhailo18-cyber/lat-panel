@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Premium Plus mark (placeholder until the final logo is delivered). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <path android:pathData="M24,4h48a20,20 0 0 1 20,20v48a20,20 0 0 1 -20,20h-48a20,20 0 0 1 -20,-20v-48a20,20 0 0 1 20,-20z">
+        <aapt:attr xmlns:aapt="http://schemas.android.com/aapt" name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0" android:startY="0"
+                android:endX="96" android:endY="96"
+                android:startColor="@color/brand_primary"
+                android:endColor="@color/brand_secondary" />
+        </aapt:attr>
+    </path>
+    <!-- P -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M22,24h22a14,14 0 0 1 0,28h-11v20h-11z M33,33h9a5,5 0 0 1 0,10h-9z" />
+    <!-- + -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M64,52h7v-7h6v7h7v6h-7v7h-6v-7h-7z" />
+</vector>

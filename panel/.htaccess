@@ -1,0 +1,8 @@
+Options -Indexes
+
+# Never serve configuration, internals or SQL.
+<FilesMatch "^(config\.php|config\.sample\.php|.*\.sql|.*\.md)$">
+    Require all denied
+</FilesMatch>
+
+RedirectMatch 404 ^/(.*/)?includes/

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Default language: Spanish. English is in values-en/strings.xml. app_name comes from brand.properties. -->
+<resources>
+    <string name="loading">Cargando…</string>
+    <string name="retry">Reintentar</string>
+    <string name="ok">Entendido</string>
+
+    <string name="error_network">No hay conexión con el servidor. Revisa tu internet.</string>
+    <string name="error_auth">Usuario o contraseña incorrectos, o la cuenta no está activa.</string>
+    <string name="error_server">El servidor respondió con un error. Intenta más tarde.</string>
+    <string name="error_key_mismatch">Este ID está vinculado a otro equipo. Contacta a tu proveedor.</string>
+
+    <string name="activation_title">Activa tu equipo</string>
+    <string name="activation_device_id">ID del dispositivo</string>
+    <string name="activation_instructions">Envía este ID a tu proveedor. En cuanto lo active, la app ingresará sola.</string>
+    <string name="activation_waiting">Esperando activación…</string>
+    <string name="activation_disabled">Este equipo está desactivado. Contacta a tu proveedor.</string>
+    <string name="activation_expired">Tu suscripción venció. Contacta a tu proveedor para renovarla.</string>
+    <string name="activation_signing_in">Ingresando…</string>
+    <string name="activation_manual">Ingreso manual (Xtream)</string>
+
+    <string name="login_title">Ingreso manual</string>
+    <string name="login_subtitle">Ingresa el usuario y la contraseña de tu cuenta.</string>
+    <string name="login_username">Usuario</string>
+    <string name="login_password">Contraseña</string>
+    <string name="login_button">Ingresar</string>
+    <string name="login_missing_fields">Ingresa tu usuario y contraseña.</string>
+    <string name="login_searching">Buscando tu servidor… (%1$d de %2$d)</string>
+    <string name="login_use_device">Activación por ID</string>
+
+    <string name="home_live">TV en vivo</string>
+    <string name="home_movies">Películas</string>
+    <string name="home_series">Series</string>
+    <string name="home_search">Buscar</string>
+    <string name="home_settings">Ajustes</string>
+    <string name="home_expires">Vence: %1$s</string>
+    <string name="home_continue">Continuar viendo</string>
+    <string name="exit_title">¿Salir de la app?</string>
+    <string name="exit_stay">Quedarme</string>
+    <string name="exit_confirm">Salir</string>
+    <string name="home_no_expiry">Sin vencimiento</string>
+
+    <string name="category_all">Todos</string>
+    <string name="category_favorites">Favoritos</string>
+    <string name="empty_list">No hay contenido en esta categoría.</string>
+    <string name="live_favorite_hint">Mantén presionado un canal (OK o clic largo) para agregarlo o quitarlo de favoritos</string>
+    <string name="favorite_added">Agregado a favoritos</string>
+    <string name="favorite_removed">Quitado de favoritos</string>
+    <string name="epg_now">Ahora</string>
+    <string name="epg_next">Después</string>
+    <string name="epg_none">Sin guía de programación</string>
+
+    <string name="play">Reproducir</string>
+    <string name="resume_from">Continuar (%1$s)</string>
+    <string name="play_from_start">Desde el inicio</string>
+    <string name="season_n">Temporada %1$d</string>
+    <string name="episode_n">Episodio %1$d</string>
+    <string name="no_episodes">Esta serie no tiene episodios disponibles.</string>
+
+    <string name="search_hint">Escribe para buscar…</string>
+    <string name="search_no_results">Sin resultados</string>
+
+    <string name="settings_account">Cuenta</string>
+    <string name="settings_mode">Modo de ingreso</string>
+    <string name="settings_mode_device">Activación por ID</string>
+    <string name="settings_mode_manual">Manual (Xtream)</string>
+    <string name="settings_username">Usuario</string>
+    <string name="settings_status">Estado</string>
+    <string name="status_active">Activa</string>
+    <string name="status_expired">Vencida</string>
+    <string name="status_banned">Bloqueada</string>
+    <string name="status_disabled">Desactivada</string>
+    <string name="settings_expires">Vencimiento</string>
+    <string name="settings_connections">Conexiones</string>
+    <string name="settings_device">Equipo</string>
+    <string name="settings_device_id">ID del dispositivo</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_playback">Reproducción</string>
+    <string name="settings_live_format">Formato de TV en vivo</string>
+    <string name="settings_format_ts">MPEG-TS (recomendado)</string>
+    <string name="settings_format_hls">HLS (m3u8)</string>
+    <string name="settings_actions">Acciones</string>
+    <string name="settings_reload">Recargar contenido</string>
+    <string name="settings_reloaded">Contenido recargado</string>
+    <string name="settings_switch_manual">Cambiar a ingreso manual</string>
+    <string name="settings_switch_device">Cambiar a activación por ID</string>
+    <string name="settings_sign_out_manual">Cerrar sesión manual</string>
+
+    <string name="player_reconnecting">Reconectando…</string>
+    <string name="player_error">No se pudo reproducir este contenido.</string>
+
+    <!-- Loading / progress feedback -->
+    <string name="splash_connecting">Conectando…</string>
+    <string name="splash_slow">Está tardando más de lo normal. Revisa tu conexión a internet.</string>
+    <string name="activation_auto_check">Se revisa automáticamente cada pocos segundos.</string>
+    <string name="activation_retrying">Reintentando automáticamente…</string>
+    <string name="login_connecting">Conectando…</string>
+    <string name="login_show_password">Mostrar</string>
+    <string name="login_hide_password">Ocultar</string>
+    <string name="home_expires_today">Vence hoy</string>
+    <string name="home_expired">Vencido</string>
+    <plurals name="home_expires_in">
+        <item quantity="one">Vence en %d día</item>
+        <item quantity="other">Vence en %d días</item>
+    </plurals>
+    <string name="loading_categories">Cargando categorías…</string>
+    <string name="loading_channels">Cargando canales…</string>
+    <string name="loading_guide">Cargando guía…</string>
+    <string name="loading_movies">Cargando películas…</string>
+    <string name="loading_series">Cargando series…</string>
+    <string name="loading_details">Cargando detalles…</string>
+    <string name="live_no_favorites">Aún no tienes favoritos. Mantén presionado un canal (OK o clic largo) para agregarlo.</string>
+    <string name="episode_resume">Continuar desde %1$s</string>
+    <string name="search_start_hint">Escribe al menos 2 letras para buscar en canales, películas y series.</string>
+    <string name="search_loading">Buscando en todo el contenido… La primera búsqueda puede tardar unos segundos.</string>
+    <string name="player_loading">Cargando %1$s…</string>
+    <string name="player_back">Volver</string>
+    <string name="player_error_keys">OK: reintentar · Atrás: volver</string>
+    <string name="player_resuming">Continuando desde %1$s</string>
+    <string name="player_next_episode">Siguiente: %1$s</string>
+</resources>

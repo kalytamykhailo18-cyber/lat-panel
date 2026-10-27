@@ -1,0 +1,6 @@
+RewriteEngine On
+RewriteRule ^(live|movie|series)/([^/]+)/([^/]+)/([0-9]+)\.[A-Za-z0-9]+$ stream.php?type=$1&u=$2&p=$3&id=$4 [L,QSA]
+
+<FilesMatch "^(content|demo)\.php$">
+    Require all denied
+</FilesMatch>

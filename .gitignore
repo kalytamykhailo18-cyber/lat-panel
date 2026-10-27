@@ -1,0 +1,14 @@
+# Internal: never part of the client delivery (tools/package.py skips these too)
+overview/
+deploy/
+dist/
+panel/config.php
+android/local.properties
+android/keystore.properties
+*.jks
+.tmp/
+.toolchain/
+.gradle/
+.vscode/
+
+tools/
