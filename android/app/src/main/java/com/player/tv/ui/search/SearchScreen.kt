@@ -33,17 +33,19 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.player.tv.R
 import com.player.tv.data.Graph
+import com.player.tv.data.Parental
+import com.player.tv.data.allowed
 import com.player.tv.data.LiveChannel
 import com.player.tv.data.Movie
 import com.player.tv.data.Series
 import com.player.tv.ui.components.AnimatedLoadable
-import com.player.tv.ui.components.AppBackground
-import com.player.tv.ui.components.BackButton
+import androidx.compose.foundation.layout.Box
 import com.player.tv.ui.components.EmptyView
 import com.player.tv.ui.components.ErrorView
 import com.player.tv.ui.components.Loadable
 import com.player.tv.ui.components.LoadingView
 import com.player.tv.ui.components.PosterCard
+import com.player.tv.ui.components.RowPager
 import com.player.tv.ui.components.TvTextField
 import com.player.tv.ui.components.loadable
 import com.player.tv.ui.components.requestWhenReady
@@ -85,9 +87,9 @@ class SearchViewModel : ViewModel() {
                 val movies = async { xtream.movies(null) }
                 val series = async { xtream.series(null) }
                 Results(
-                    live.await().filter { normalize(it.name).contains(q) }.take(MAX),
-                    movies.await().filter { normalize(it.name).contains(q) }.take(MAX),
-                    series.await().filter { normalize(it.name).contains(q) }.take(MAX),
+                    live.await().allowed(Parental.Type.LIVE) { it.categoryId }.filter { normalize(it.name).contains(q) }.take(MAX),
+                    movies.await().allowed(Parental.Type.VOD) { it.categoryId }.filter { normalize(it.name).contains(q) }.take(MAX),
+                    series.await().allowed(Parental.Type.SERIES) { it.categoryId }.filter { normalize(it.name).contains(q) }.take(MAX),
                 )
             }
         }
@@ -120,10 +122,9 @@ fun SearchScreen(onOpenMovie: (Int) -> Unit, onOpenSeries: (Int) -> Unit, vm: Se
     val screen = screenInfo()
     val posterWidth = if (screen.compact) 116.dp else 150.dp
 
-    AppBackground {
-        Column(Modifier.fillMaxSize().padding(horizontal = screen.gutter, vertical = if (screen.compact) 16.dp else 32.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Box(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().padding(start = 28.dp, end = 32.dp, top = 28.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                BackButton(Modifier.padding(bottom = 4.dp))
                 TvTextField(
                     value = query,
                     onValueChange = vm::onQuery,
@@ -144,26 +145,29 @@ fun SearchScreen(onOpenMovie: (Int) -> Unit, onOpenSeries: (Int) -> Unit, vm: Se
                 if (found.isEmpty) {
                     EmptyView(stringResource(R.string.search_no_results))
                 } else {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(24.dp), contentPadding = PaddingValues(bottom = 32.dp)) {
-                        if (found.live.isNotEmpty()) item {
-                            ResultRow(stringResource(R.string.home_live)) {
-                                itemsIndexed(found.live, key = { _, it -> it.streamId }) { index, ch ->
-                                    PosterCard(ch.name, ch.logo, onClick = { vm.playLive(context, found.live, index) }, modifier = Modifier.width(if (screen.compact) 160.dp else 200.dp),
+                    // One row of results at a time; Down / Up slide the next kind in.
+                    val kinds = listOfNotNull(
+                        stringResource(R.string.home_live).takeIf { found.live.isNotEmpty() },
+                        stringResource(R.string.home_movies).takeIf { found.movies.isNotEmpty() },
+                        stringResource(R.string.home_series).takeIf { found.series.isNotEmpty() },
+                    )
+                    val live = stringResource(R.string.home_live)
+                    val movies = stringResource(R.string.home_movies)
+                    RowPager(kinds.size, Modifier.fillMaxSize(), nextLabel = { kinds.getOrNull(it + 1) }, hintStart = 4.dp) { i, height ->
+                        // Card image height: the row minus its title, focus room and the caption.
+                        val image = height - 56.dp - 28.dp
+                        ResultRow(kinds[i]) {
+                            when (kinds[i]) {
+                                live -> itemsIndexed(found.live, key = { _, it -> it.streamId }) { index, ch ->
+                                    PosterCard(ch.name, ch.logo, onClick = { vm.playLive(context, found.live, index) },
+                                        modifier = Modifier.width(minOf(if (screen.compact) 160.dp else 200.dp, image * 16f / 9f)),
                                         aspectRatio = 16f / 9f, imageScale = ContentScale.Fit)
                                 }
-                            }
-                        }
-                        if (found.movies.isNotEmpty()) item {
-                            ResultRow(stringResource(R.string.home_movies)) {
-                                items(found.movies, key = { it.streamId }) { m ->
-                                    PosterCard(m.name, m.poster, onClick = { onOpenMovie(m.streamId) }, modifier = Modifier.width(posterWidth))
+                                movies -> items(found.movies, key = { it.streamId }) { m ->
+                                    PosterCard(m.name, m.poster, onClick = { onOpenMovie(m.streamId) }, modifier = Modifier.width(minOf(posterWidth, image * 2f / 3f)))
                                 }
-                            }
-                        }
-                        if (found.series.isNotEmpty()) item {
-                            ResultRow(stringResource(R.string.home_series)) {
-                                items(found.series, key = { it.seriesId }) { s ->
-                                    PosterCard(s.name, s.cover, onClick = { onOpenSeries(s.seriesId) }, modifier = Modifier.width(posterWidth))
+                                else -> items(found.series, key = { it.seriesId }) { sr ->
+                                    PosterCard(sr.name, sr.cover, onClick = { onOpenSeries(sr.seriesId) }, modifier = Modifier.width(minOf(posterWidth, image * 2f / 3f)))
                                 }
                             }
                         }

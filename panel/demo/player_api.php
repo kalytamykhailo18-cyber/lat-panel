@@ -48,18 +48,29 @@ switch ($_GET['action'] ?? '') {
         out($channels);
 
     case 'get_short_epg':
-        // Rotating 30-minute schedule built from the open movies, so the guide is never empty.
-        $titles = array_column($c['vod'], 'name');
-        $slot = 1800;
-        $start = intdiv(time(), $slot) * $slot;
-        $offset = (int)($_GET['stream_id'] ?? 0);
+        // Made-up daily schedule per channel (programs of 30 to 90 minutes), so the guide is never
+        // empty. Same result on every call: the day is built from midnight UTC.
+        $titles = array_merge(array_map(fn($n) => 'Cine abierto: ' . $n, array_column($c['vod'], 'name')),
+            ['Señal de prueba', 'Documental de animación', 'Detrás de cámaras', 'Música libre', 'Cortos de la comunidad', 'Noticias de prueba']);
+        $lengths = [30, 60, 45, 90, 30, 60];   // minutes
+        $stream = max(1, (int)($_GET['stream_id'] ?? 1));
+        $limit = min(48, max(1, (int)($_GET['limit'] ?? 4)));
+        $now = time();
+        $t = intdiv($now, 86400) * 86400;
+        $i = $stream * 7;
         $listings = [];
-        for ($i = 0; $i < 2; $i++) {
-            $title = $titles[($offset + intdiv($start, $slot) + $i) % count($titles)];
-            $listings[] = [
-                'title' => base64_encode($title), 'description' => base64_encode('Contenido de demostración libre de derechos. (CC) Blender Foundation.'),
-                'start_timestamp' => (string)($start + $i * $slot), 'stop_timestamp' => (string)($start + ($i + 1) * $slot),
-            ];
+        while (count($listings) < $limit) {
+            $end = $t + $lengths[$i % count($lengths)] * 60;
+            if ($end > $now) {
+                $title = $titles[($i * 3 + $stream) % count($titles)];
+                $listings[] = [
+                    'title' => base64_encode($title),
+                    'description' => base64_encode('Contenido de demostración libre de derechos. (CC) Blender Foundation.'),
+                    'start_timestamp' => (string)$t, 'stop_timestamp' => (string)$end,
+                ];
+            }
+            $t = $end;
+            $i++;
         }
         out(['epg_listings' => $listings]);
 

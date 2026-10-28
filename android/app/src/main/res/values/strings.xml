@@ -33,7 +33,6 @@
     <string name="home_series">Series</string>
     <string name="home_search">Buscar</string>
     <string name="home_settings">Ajustes</string>
-    <string name="home_expires">Vence: %1$s</string>
     <string name="home_continue">Continuar viendo</string>
     <string name="exit_title">¿Salir de la app?</string>
     <string name="exit_stay">Quedarme</string>
@@ -79,7 +78,6 @@
     <string name="settings_live_format">Formato de TV en vivo</string>
     <string name="settings_format_ts">MPEG-TS (recomendado)</string>
     <string name="settings_format_hls">HLS (m3u8)</string>
-    <string name="settings_actions">Acciones</string>
     <string name="settings_reload">Recargar contenido</string>
     <string name="settings_reloaded">Contenido recargado</string>
     <string name="settings_switch_manual">Cambiar a ingreso manual</string>
@@ -97,12 +95,6 @@
     <string name="login_connecting">Conectando…</string>
     <string name="login_show_password">Mostrar</string>
     <string name="login_hide_password">Ocultar</string>
-    <string name="home_expires_today">Vence hoy</string>
-    <string name="home_expired">Vencido</string>
-    <plurals name="home_expires_in">
-        <item quantity="one">Vence en %d día</item>
-        <item quantity="other">Vence en %d días</item>
-    </plurals>
     <string name="loading_categories">Cargando categorías…</string>
     <string name="loading_channels">Cargando canales…</string>
     <string name="loading_guide">Cargando guía…</string>
@@ -118,4 +110,99 @@
     <string name="player_error_keys">OK: reintentar · Atrás: volver</string>
     <string name="player_resuming">Continuando desde %1$s</string>
     <string name="player_next_episode">Siguiente: %1$s</string>
+
+    <!-- Main menu, home -->
+    <string name="home_title">Inicio</string>
+    <string name="guide_title">Guía TV</string>
+    <string name="home_recent_movies">Películas recientes</string>
+    <string name="home_recent_series">Series recientes</string>
+    <string name="home_kind_live">En vivo</string>
+    <string name="home_kind_movie">Película</string>
+    <string name="home_kind_series">Serie</string>
+
+    <!-- Live TV -->
+    <string name="live_preview_hint">Pulsa OK en un canal para verlo aquí</string>
+    <string name="live_fullscreen_hint">OK otra vez: pantalla completa</string>
+    <string name="live_keys_hint">OK: vista previa · OK otra vez: pantalla completa · Mantener OK: favorito</string>
+
+    <!-- Guide -->
+    <string name="guide_hint">Muévete por la guía con el control. OK en un programa en emisión abre el canal.</string>
+    <string name="guide_starts_at">Empieza a las %1$s</string>
+
+    <!-- Player -->
+    <string name="player_audio">Audio</string>
+    <string name="player_subtitles">Subtítulos</string>
+    <string name="player_speed">Velocidad</string>
+    <string name="player_speed_normal">Normal</string>
+    <string name="player_next">Siguiente</string>
+    <string name="player_subtitles_off">Desactivados</string>
+    <string name="player_no_subtitles">Este contenido no trae subtítulos.</string>
+    <string name="player_no_audio_tracks">Este contenido tiene una sola pista de audio.</string>
+    <string name="player_track_n">Pista %1$d</string>
+
+    <!-- Settings -->
+    <string name="settings_content">Contenido</string>
+    <string name="settings_content_hint">Si tu proveedor agregó canales o películas, recarga el contenido para verlos.</string>
+    <string name="settings_clear_history">Borrar \"Continuar viendo\"</string>
+    <string name="settings_history_cleared">Historial borrado</string>
+    <string name="settings_clear_favorites">Borrar favoritos</string>
+    <string name="settings_favorites_cleared">Favoritos borrados</string>
+    <string name="settings_subtitles">Subtítulos al reproducir</string>
+    <string name="settings_subtitle_size">Tamaño de subtítulos</string>
+    <string name="settings_subtitles_hint">Durante la película también puedes cambiar los subtítulos y el audio desde los botones del reproductor.</string>
+    <string name="language_es">Español</string>
+    <string name="language_en">Inglés</string>
+    <string name="size_small">Pequeño</string>
+    <string name="size_normal">Normal</string>
+    <string name="size_large">Grande</string>
+    <string name="settings_model">Modelo</string>
+    <string name="settings_android">Android</string>
+
+    <!-- Parental control -->
+    <string name="parental_title">Control parental</string>
+    <string name="parental_description">Bloquea con un PIN las categorías que no quieres que se vean. Para abrirlas se pide el PIN, y su contenido no aparece en Inicio ni en Buscar.</string>
+    <string name="parental_on">Activado</string>
+    <string name="parental_off">Desactivado</string>
+    <string name="parental_enable">Activar control parental</string>
+    <string name="parental_manage">Administrar (pide el PIN)</string>
+    <string name="parental_change_pin">Cambiar PIN</string>
+    <string name="parental_disable">Desactivar</string>
+    <string name="parental_create_pin">Crea un PIN de 4 dígitos</string>
+    <string name="parental_confirm_pin">Repite el PIN</string>
+    <string name="parental_current_pin">PIN actual</string>
+    <string name="parental_new_pin">Nuevo PIN</string>
+    <string name="parental_enter_pin">Ingresa el PIN</string>
+    <string name="parental_enabled_toast">Control parental activado. Las categorías para adultos quedaron bloqueadas.</string>
+    <string name="parental_pin_changed">PIN cambiado</string>
+    <string name="parental_categories">Categorías bloqueadas</string>
+    <string name="parental_categories_hint">Pulsa OK en una categoría para bloquearla o desbloquearla.</string>
+    <string name="parental_locked">Bloqueada</string>
+    <string name="parental_unlocked">Libre</string>
+    <string name="parental_locked_category">Esta categoría está bloqueada por el control parental.</string>
+    <string name="parental_unlock">Desbloquear</string>
+    <string name="pin_hint">Usa los números del control o el teclado de la pantalla.</string>
+    <string name="pin_wrong">PIN incorrecto. Inténtalo de nuevo.</string>
+    <string name="player_screen">Pantalla</string>
+    <string name="player_channels">Canales</string>
+    <string name="player_favorite">Favorito</string>
+    <string name="player_favorite_on">En favoritos</string>
+    <string name="screen_fit">Ajustar a la pantalla</string>
+    <string name="screen_fill">Llenar la pantalla</string>
+    <string name="screen_zoom">Zoom</string>
+    <string name="screen_note">Se recuerda para todos los canales y películas.</string>
+    <string name="player_live_no_subtitles">Este canal no trae subtítulos en este momento.</string>
+    <string name="player_live_no_audio_tracks">Este canal tiene una sola pista de audio.</string>
+    <string name="player_tracks_loading">Todavía está cargando. Vuelve a abrir este menú en un momento.</string>
+    <string name="player_choice_kept">Tu elección se mantiene al cambiar de canal o de episodio.</string>
+    <string name="live_player_hint">OK: opciones · ▲▼: cambiar canal · ◀: lista de canales</string>
+    <string name="live_player_hint_touch">Toca para ver opciones · Desliza arriba o abajo para cambiar de canal</string>
+    <string name="live_player_zap_hint">▲▼ cambiar canal · Atrás: ocultar</string>
+    <plurals name="channel_count">
+        <item quantity="one">%1$d canal</item>
+        <item quantity="many">%1$d canales</item>
+        <item quantity="other">%1$d canales</item>
+    </plurals>
+    <string name="player_no_channel_number">No hay un canal con el número %1$d en esta lista.</string>
+    <string name="player_error_keys_live">OK: reintentar · ▲▼: otro canal · ◀: lista de canales · Atrás: volver</string>
+    <string name="home_preview_hint">Vista previa sin sonido · OK para verlo</string>
 </resources>

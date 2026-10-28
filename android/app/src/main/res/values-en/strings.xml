@@ -32,7 +32,6 @@
     <string name="home_series">Series</string>
     <string name="home_search">Search</string>
     <string name="home_settings">Settings</string>
-    <string name="home_expires">Expires: %1$s</string>
     <string name="home_continue">Continue watching</string>
     <string name="exit_title">Exit the app?</string>
     <string name="exit_stay">Stay</string>
@@ -78,7 +77,6 @@
     <string name="settings_live_format">Live stream format</string>
     <string name="settings_format_ts">MPEG-TS (recommended)</string>
     <string name="settings_format_hls">HLS (m3u8)</string>
-    <string name="settings_actions">Actions</string>
     <string name="settings_reload">Reload content</string>
     <string name="settings_reloaded">Content reloaded</string>
     <string name="settings_switch_manual">Switch to manual login</string>
@@ -96,12 +94,6 @@
     <string name="login_connecting">Connecting…</string>
     <string name="login_show_password">Show</string>
     <string name="login_hide_password">Hide</string>
-    <string name="home_expires_today">Expires today</string>
-    <string name="home_expired">Expired</string>
-    <plurals name="home_expires_in">
-        <item quantity="one">Expires in %d day</item>
-        <item quantity="other">Expires in %d days</item>
-    </plurals>
     <string name="loading_categories">Loading categories…</string>
     <string name="loading_channels">Loading channels…</string>
     <string name="loading_guide">Loading guide…</string>
@@ -117,4 +109,98 @@
     <string name="player_error_keys">OK: retry · Back: go back</string>
     <string name="player_resuming">Resuming from %1$s</string>
     <string name="player_next_episode">Next: %1$s</string>
+
+    <!-- Main menu, home -->
+    <string name="home_title">Home</string>
+    <string name="guide_title">TV Guide</string>
+    <string name="home_recent_movies">Recently added movies</string>
+    <string name="home_recent_series">Recently updated series</string>
+    <string name="home_kind_live">Live</string>
+    <string name="home_kind_movie">Movie</string>
+    <string name="home_kind_series">Series</string>
+
+    <!-- Live TV -->
+    <string name="live_preview_hint">Press OK on a channel to watch it here</string>
+    <string name="live_fullscreen_hint">OK again: full screen</string>
+    <string name="live_keys_hint">OK: preview · OK again: full screen · Hold OK: favorite</string>
+
+    <!-- Guide -->
+    <string name="guide_hint">Move through the guide with the remote. OK on a program on air opens the channel.</string>
+    <string name="guide_starts_at">Starts at %1$s</string>
+
+    <!-- Player -->
+    <string name="player_audio">Audio</string>
+    <string name="player_subtitles">Subtitles</string>
+    <string name="player_speed">Speed</string>
+    <string name="player_speed_normal">Normal</string>
+    <string name="player_next">Next</string>
+    <string name="player_subtitles_off">Off</string>
+    <string name="player_no_subtitles">This content has no subtitles.</string>
+    <string name="player_no_audio_tracks">This content has a single audio track.</string>
+    <string name="player_track_n">Track %1$d</string>
+
+    <!-- Settings -->
+    <string name="settings_content">Content</string>
+    <string name="settings_content_hint">If your provider added channels or movies, reload the content to see them.</string>
+    <string name="settings_clear_history">Clear \"Continue watching\"</string>
+    <string name="settings_history_cleared">History cleared</string>
+    <string name="settings_clear_favorites">Clear favorites</string>
+    <string name="settings_favorites_cleared">Favorites cleared</string>
+    <string name="settings_subtitles">Subtitles when playing</string>
+    <string name="settings_subtitle_size">Subtitle size</string>
+    <string name="settings_subtitles_hint">While watching you can also change subtitles and audio from the player buttons.</string>
+    <string name="language_es">Spanish</string>
+    <string name="language_en">English</string>
+    <string name="size_small">Small</string>
+    <string name="size_normal">Normal</string>
+    <string name="size_large">Large</string>
+    <string name="settings_model">Model</string>
+    <string name="settings_android">Android</string>
+
+    <!-- Parental control -->
+    <string name="parental_title">Parental control</string>
+    <string name="parental_description">Lock with a PIN the categories you do not want watched. Opening them asks for the PIN, and their content does not appear on Home or in Search.</string>
+    <string name="parental_on">On</string>
+    <string name="parental_off">Off</string>
+    <string name="parental_enable">Turn on parental control</string>
+    <string name="parental_manage">Manage (asks for the PIN)</string>
+    <string name="parental_change_pin">Change PIN</string>
+    <string name="parental_disable">Turn off</string>
+    <string name="parental_create_pin">Create a 4-digit PIN</string>
+    <string name="parental_confirm_pin">Repeat the PIN</string>
+    <string name="parental_current_pin">Current PIN</string>
+    <string name="parental_new_pin">New PIN</string>
+    <string name="parental_enter_pin">Enter the PIN</string>
+    <string name="parental_enabled_toast">Parental control is on. Adult categories have been locked.</string>
+    <string name="parental_pin_changed">PIN changed</string>
+    <string name="parental_categories">Locked categories</string>
+    <string name="parental_categories_hint">Press OK on a category to lock or unlock it.</string>
+    <string name="parental_locked">Locked</string>
+    <string name="parental_unlocked">Open</string>
+    <string name="parental_locked_category">This category is locked by parental control.</string>
+    <string name="parental_unlock">Unlock</string>
+    <string name="pin_hint">Use the number keys on the remote or the on-screen keypad.</string>
+    <string name="pin_wrong">Wrong PIN. Try again.</string>
+    <string name="player_screen">Screen</string>
+    <string name="player_channels">Channels</string>
+    <string name="player_favorite">Favorite</string>
+    <string name="player_favorite_on">In favorites</string>
+    <string name="screen_fit">Fit to screen</string>
+    <string name="screen_fill">Fill the screen</string>
+    <string name="screen_zoom">Zoom</string>
+    <string name="screen_note">Remembered for every channel and movie.</string>
+    <string name="player_live_no_subtitles">This channel has no subtitles right now.</string>
+    <string name="player_live_no_audio_tracks">This channel has a single audio track.</string>
+    <string name="player_tracks_loading">Still loading. Open this menu again in a moment.</string>
+    <string name="player_choice_kept">Your choice stays when you change channel or episode.</string>
+    <string name="live_player_hint">OK: options · ▲▼: change channel · ◀: channel list</string>
+    <string name="live_player_hint_touch">Tap for options · Swipe up or down to change channel</string>
+    <string name="live_player_zap_hint">▲▼ change channel · Back: hide</string>
+    <plurals name="channel_count">
+        <item quantity="one">%1$d channel</item>
+        <item quantity="other">%1$d channels</item>
+    </plurals>
+    <string name="player_no_channel_number">There is no channel number %1$d in this list.</string>
+    <string name="player_error_keys_live">OK: retry · ▲▼: another channel · ◀: channel list · Back: go back</string>
+    <string name="home_preview_hint">Muted preview · OK to watch</string>
 </resources>

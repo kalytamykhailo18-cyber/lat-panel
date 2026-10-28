@@ -16,9 +16,9 @@ return [
     ],
     'live' => [
         ['id' => 1, 'category' => '1', 'name' => 'Big Buck Bunny 24/7', 'logo' => 'img/live1.png', 'url' => 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8'],
-        ['id' => 2, 'category' => '1', 'name' => 'Bip Bop Test', 'logo' => 'img/live2.png', 'url' => 'https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_16x9/bipbop_16x9_variant.m3u8'],
+        ['id' => 2, 'category' => '1', 'name' => 'Bip Bop Test', 'logo' => 'img/live2.png', 'url' => 'https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8'],
         ['id' => 3, 'category' => '1', 'name' => 'Señal de prueba', 'logo' => 'img/live3.png', 'url' => 'https://cph-p2p-msl.akamaized.net/hls/live/2000341/test/master.m3u8'],
-        ['id' => 4, 'category' => '1', 'name' => 'Tears of Steel', 'logo' => 'img/live4.png', 'url' => 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8'],
+        ['id' => 4, 'category' => '1', 'name' => 'Tears of Steel', 'logo' => 'img/live4.png', 'url' => 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel-wvtt.ism/.m3u8'],
     ],
 
     'vod_categories' => [
@@ -35,8 +35,8 @@ return [
          'poster' => 'img/ed.png', 'backdrop' => 'img/ed_backdrop.jpg', 'ext' => 'mp4', 'url' => 'https://archive.org/download/ElephantsDream/ed_1024_512kb.mp4',
          'plot' => 'Dos personajes exploran un extraño mundo mecánico. La primera película abierta. (CC) Blender Foundation.'],
         ['id' => 104, 'category' => '10', 'name' => 'Tears of Steel', 'year' => '2012', 'duration' => '00:12:14', 'rating' => '6.9',
-         'poster' => 'img/tos.png', 'backdrop' => 'img/tos_backdrop.jpg', 'ext' => 'm3u8', 'url' => 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
-         'plot' => 'Un grupo de científicos en Ámsterdam intenta salvar al mundo de los robots. (CC) Blender Foundation.'],
+         'poster' => 'img/tos.png', 'backdrop' => 'img/tos_backdrop.jpg', 'ext' => 'm3u8', 'url' => 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel-wvtt.ism/.m3u8',
+         'plot' => 'Un grupo de científicos en Ámsterdam intenta salvar al mundo de los robots. Con subtítulos en español, inglés, francés, alemán y ruso. (CC) Blender Foundation.'],
     ],
 
     'series_categories' => [

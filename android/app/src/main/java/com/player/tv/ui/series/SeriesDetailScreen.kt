@@ -1,6 +1,11 @@
 package com.player.tv.ui.series
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,9 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -140,82 +143,102 @@ private fun SeriesDetail(info: SeriesInfo) {
     }
 
     val screen = screenInfo()
+    val short = screen.shortHeight
     val side = if (screen.expanded) 56.dp else screen.gutter
+    var focusedEpisode by remember { mutableStateOf<Episode?>(null) }
     Box(Modifier.fillMaxSize()) {
         Backdrop(info.backdrop ?: info.series.cover)
-        // Header, seasons and episodes scroll together, so a long plot never pushes the list off screen.
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(start = side, end = side, top = 84.dp, bottom = 32.dp),
-            modifier = Modifier.fillMaxSize().focusRestorer(),
+        // Fixed header, the seasons, and the season's episodes as one row of cards that always
+        // fits whole; Left / Right move through the episodes.
+        Column(
+            Modifier.fillMaxSize().padding(top = if (short) 26.dp else 84.dp, bottom = if (short) 8.dp else 20.dp),
+            verticalArrangement = Arrangement.spacedBy(if (short) 6.dp else 12.dp),
         ) {
-            item(key = "header") {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(
-                        info.series.name,
-                        style = if (screen.compact) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.displaySmall,
-                        color = Brand.TextPrimary, fontWeight = FontWeight.Bold, maxLines = 3,
-                    )
-                    val meta = listOfNotNull(info.releaseDate?.take(4), info.series.rating?.let { "★ $it" }, info.genre).joinToString("  ·  ")
-                    if (meta.isNotEmpty()) Text(meta, style = MaterialTheme.typography.titleMedium, color = Brand.TextSecondary)
-                    info.plot?.let {
-                        Text(it, style = MaterialTheme.typography.bodyLarge, color = Brand.TextPrimary, maxLines = if (screen.compact) 6 else 3,
-                            overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 900.dp))
-                    }
+            // Low screens (phones): the title sits beside the back button and the details line is left out.
+            Column(Modifier.padding(start = if (short) 88.dp else side, end = side), verticalArrangement = Arrangement.spacedBy(if (short) 4.dp else 10.dp)) {
+                Text(
+                    info.series.name,
+                    style = if (screen.compact || short) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.displaySmall,
+                    color = Brand.TextPrimary, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                )
+                val meta = listOfNotNull(info.releaseDate?.take(4), info.series.rating?.let { "★ $it" }, info.genre).joinToString("  ·  ")
+                if (meta.isNotEmpty() && !short) Text(meta, style = MaterialTheme.typography.titleMedium, color = Brand.TextSecondary, maxLines = 1)
+                if (!short) info.plot?.let {
+                    Text(it, style = MaterialTheme.typography.bodyLarge, color = Brand.TextPrimary, maxLines = 2,
+                        overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 900.dp))
                 }
             }
 
             if (info.seasons.isEmpty()) {
-                item(key = "empty") { Box(Modifier.fillMaxWidth().height(200.dp)) { EmptyView(stringResource(R.string.no_episodes)) } }
-                return@LazyColumn
+                Box(Modifier.fillMaxWidth().weight(1f)) { EmptyView(stringResource(R.string.no_episodes)) }
+                return@Column
             }
 
-            item(key = "seasons") {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp), modifier = Modifier.focusRestorer()) {
-                    itemsIndexed(info.seasons, key = { _, s -> s.number }) { index, s ->
-                        Pill(
-                            text = stringResource(R.string.season_n, s.number),
-                            selected = index == seasonIndex,
-                            onClick = { seasonIndex = index },
-                            modifier = if (index == 0) Modifier.focusRequester(firstFocus) else Modifier,
-                        )
-                    }
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(start = if (short) 88.dp else side, end = side, top = 6.dp, bottom = 6.dp),
+                modifier = Modifier.focusRestorer(),
+            ) {
+                itemsIndexed(info.seasons, key = { _, s -> s.number }) { index, s ->
+                    Pill(
+                        text = stringResource(R.string.season_n, s.number),
+                        selected = index == seasonIndex,
+                        onClick = { seasonIndex = index },
+                        modifier = if (index == 0) Modifier.focusRequester(firstFocus) else Modifier,
+                    )
                 }
             }
 
             if (season != null) {
-                itemsIndexed(season.episodes, key = { _, e -> "e" + e.id }) { index, episode ->
-                    EpisodeRow(
-                        episode,
-                        fallbackImage = info.series.cover,
-                        resumeMs = remember(resumeRefresh, episode.id) { Graph.store.resumePosition("episode:${episode.id}") },
-                        compact = screen.compact,
-                        onClick = { play(season.episodes, index) },
-                    )
+                BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
+                    // Thumbnail height: what is left after the captions, the focus room and the plot line.
+                    // Low screens (phones) skip the plot line to keep the cards a useful size.
+                    val thumb = (maxHeight - EpisodeCaption - 20.dp - (if (short) 0.dp else 44.dp)).coerceAtLeast(48.dp)
+                    val cardWidth = minOf(if (screen.compact) 220.dp else 300.dp, thumb * 16f / 9f)
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(18.dp),
+                            contentPadding = PaddingValues(horizontal = side, vertical = 10.dp),
+                            modifier = Modifier.focusRestorer(),
+                        ) {
+                            itemsIndexed(season.episodes, key = { _, e -> "e" + e.id }) { index, episode ->
+                                EpisodeCard(
+                                    episode,
+                                    fallbackImage = info.series.cover,
+                                    resumeMs = remember(resumeRefresh, episode.id) { Graph.store.resumePosition("episode:${episode.id}") },
+                                    width = cardWidth,
+                                    onFocus = { focusedEpisode = episode },
+                                    onClick = { play(season.episodes, index) },
+                                )
+                            }
+                        }
+                        // What the focused episode is about.
+                        val plot = focusedEpisode?.takeIf { it in season.episodes }?.plot
+                        if (!short) Text(plot.orEmpty(), style = MaterialTheme.typography.bodyMedium, color = Brand.TextSecondary, maxLines = 2,
+                            overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(horizontal = side).widthIn(max = 900.dp))
+                    }
                 }
             }
         }
     }
 }
 
+// Under an episode thumbnail: episode number and length, the title and the resume point.
+private val EpisodeCaption = 84.dp
+
 @Composable
-private fun EpisodeRow(episode: Episode, fallbackImage: String?, resumeMs: Long, compact: Boolean, onClick: () -> Unit) {
+private fun EpisodeCard(episode: Episode, fallbackImage: String?, resumeMs: Long, width: Dp, onFocus: () -> Unit, onClick: () -> Unit) {
     val shape = RoundedCornerShape(12.dp)
-    Surface(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth().widthIn(max = 1000.dp).tapToClick(onClick),
-        shape = ClickableSurfaceDefaults.shape(shape),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
-        border = ClickableSurfaceDefaults.border(focusedBorder = Border(BorderStroke(2.dp, Brand.Primary), shape = shape)),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = Brand.Surface.copy(alpha = 0.9f),
-            focusedContainerColor = Brand.SurfaceHigh,
-            contentColor = Brand.TextPrimary,
-            focusedContentColor = Color.White,
-        ),
-    ) {
-        Row(Modifier.padding(if (compact) 8.dp else 12.dp), horizontalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(width = if (compact) 112.dp else 176.dp, height = if (compact) 63.dp else 99.dp).clip(RoundedCornerShape(8.dp)).background(Color(0x22FFFFFF))) {
+    Column(Modifier.width(width), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Surface(
+            onClick = onClick,
+            modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f).onFocusChanged { if (it.isFocused) onFocus() }.tapToClick(onClick),
+            shape = ClickableSurfaceDefaults.shape(shape),
+            scale = ClickableSurfaceDefaults.scale(focusedScale = 1.06f),
+            border = ClickableSurfaceDefaults.border(focusedBorder = Border(BorderStroke(2.dp, Color.White), shape = shape)),
+            colors = ClickableSurfaceDefaults.colors(containerColor = Brand.SurfaceHigh, focusedContainerColor = Brand.SurfaceHigh),
+        ) {
+            Box(Modifier.fillMaxSize()) {
                 AsyncImage(episode.image ?: fallbackImage, null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 // How far this episode was watched.
                 val totalMs = parseDurationMs(episode.duration)
@@ -225,18 +248,14 @@ private fun EpisodeRow(episode: Episode, fallbackImage: String?, resumeMs: Long,
                     }
                 }
             }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    stringResource(R.string.episode_n, episode.number) + (episode.duration?.let { "  ·  $it" } ?: ""),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = Brand.Primary,
-                )
-                Text(episode.title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (resumeMs > 0) {
-                    Text(stringResource(R.string.episode_resume, formatDuration(resumeMs)), style = MaterialTheme.typography.labelMedium, color = Brand.Warning)
-                }
-                episode.plot?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = Brand.TextSecondary, maxLines = 2) }
-            }
+        }
+        Text(
+            stringResource(R.string.episode_n, episode.number) + (episode.duration?.let { "  ·  $it" } ?: ""),
+            style = MaterialTheme.typography.labelLarge, color = Brand.Primary, maxLines = 1,
+        )
+        Text(episode.title, style = MaterialTheme.typography.titleSmall, color = Brand.TextPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        if (resumeMs > 0) {
+            Text(stringResource(R.string.episode_resume, formatDuration(resumeMs)), style = MaterialTheme.typography.labelMedium, color = Brand.Warning, maxLines = 1)
         }
     }
 }

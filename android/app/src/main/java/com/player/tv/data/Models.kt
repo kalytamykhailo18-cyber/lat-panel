@@ -35,6 +35,7 @@ data class Movie(
     val rating: String?,
     val categoryId: String?,
     val extension: String,
+    val added: Long = 0,            // epoch seconds; newest first on the home screen
 )
 
 data class MovieInfo(
@@ -54,6 +55,8 @@ data class Series(
     val cover: String?,
     val rating: String?,
     val categoryId: String?,
+    val lastModified: Long = 0,     // epoch seconds; recently updated first on the home screen
+    val plot: String? = null,
 )
 
 data class SeriesInfo(

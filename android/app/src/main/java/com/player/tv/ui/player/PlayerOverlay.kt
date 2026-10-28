@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -16,10 +17,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -33,48 +33,53 @@ import com.player.tv.ui.components.AppIcons
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import coil.compose.AsyncImage
 import com.player.tv.R
 import com.player.tv.data.EpgEntry
 import com.player.tv.ui.theme.Brand
-import java.util.Date
 import kotlin.math.abs
 
 data class OverlayState(
     val item: PlayItem? = null,
-    val showBanner: Boolean = false,
+    val index: Int = 0,                    // position of [item] in the queue
+    val showBanner: Boolean = false,       // live: short channel banner while zapping
     val epg: List<EpgEntry> = emptyList(),
     val message: String? = null,
-    val typedNumber: String? = null,   // digits being typed to jump to a channel
-    val controlsVisible: Boolean = false,  // VOD: Media3 controls on screen
+    val typedNumber: String? = null,       // digits being typed to jump to a channel
+    val controlsVisible: Boolean = false,  // VOD controls, or the live option bar
     val loading: Boolean = false,          // until the first frame: "Cargando <title>…"
     val failed: Boolean = false,           // playback gave up: retry / back panel
     val notice: String? = null,            // short message top-right (resume point, next episode)
+    val vod: VodState = VodState(),
+    val menu: MenuState? = null,           // Audio / Subtitles / Speed / Screen panel
+    val channelList: Boolean = false,      // live: channel list over the picture
+    val favorites: Set<Int> = emptySet(),
+    val listNow: Map<Int, String> = emptyMap(),   // channel list: queue index -> program on now
 )
 
 @Composable
 fun PlayerOverlay(
     state: OverlayState,
+    queue: List<PlayItem> = emptyList(),
     onTap: () -> Unit = {},
     onSwipe: (step: Int) -> Unit = {},
     onBack: () -> Unit = {},
     onRetry: () -> Unit = {},
+    onMenuChoice: (Int) -> Unit = {},
+    vodActions: VodActions? = null,
+    liveActions: LiveActions? = null,
 ) {
-    // Live TV on touch screens: tap shows the channel banner, swipe up/down changes channel.
-    // VOD keeps the gestures for Media3's own controls underneath.
-    val touch = if (state.item?.isLive == true) {
+    // Touch screens. Live: tap shows / hides the option bar, swipe up/down changes channel.
+    // VOD: tap shows / hides the controls. With a menu or the channel list open, tap closes it.
+    val live = state.item?.isLive == true
+    val touch = if (live) {
         Modifier
             .pointerInput(Unit) { detectTapGestures(onTap = { onTap() }) }
             .pointerInput(Unit) {
@@ -85,21 +90,50 @@ fun PlayerOverlay(
                     onDragEnd = { if (abs(dragged) > 80.dp.toPx()) onSwipe(if (dragged < 0) +1 else -1) },
                 )
             }
-    } else Modifier
+    } else Modifier.pointerInput(Unit) { detectTapGestures(onTap = { onTap() }) }
     Box(Modifier.fillMaxSize().then(touch)) {
         val item = state.item
         AnimatedVisibility(
-            visible = state.showBanner && item != null && item.isLive,
+            visible = state.controlsVisible && item != null && !item.isLive && !state.failed && vodActions != null,
+            enter = fadeIn(tween(200)),
+            exit = fadeOut(tween(250)),
+        ) {
+            if (item != null && vodActions != null) VodControls(item, state.vod, state.menu, vodActions)
+        }
+        AnimatedVisibility(
+            visible = live && !state.failed && !state.channelList && (state.controlsVisible || state.showBanner),
             modifier = Modifier.align(Alignment.BottomCenter),
             enter = fadeIn() + slideInVertically { it / 2 },
             exit = fadeOut() + slideOutVertically { it / 2 },
         ) {
-            if (item != null) ChannelBanner(item, state.epg)
+            if (item != null) {
+                LiveBanner(item, state.epg, favorite = item.epgStreamId in state.favorites, menu = state.menu,
+                    actions = if (state.controlsVisible) liveActions else null)
+            }
+        }
+        AnimatedVisibility(
+            visible = live && state.channelList && liveActions != null,
+            modifier = Modifier.align(Alignment.CenterStart),
+            enter = fadeIn(tween(180)) + slideInHorizontally(tween(220)) { -it / 3 },
+            exit = fadeOut(tween(150)) + slideOutHorizontally(tween(180)) { -it / 3 },
+        ) {
+            if (liveActions != null) ChannelListPanel(queue, state.index, state.favorites, state.listNow, liveActions)
+        }
+        // Keep the last menu while its panel slides out.
+        var lastMenu by remember { mutableStateOf<MenuState?>(null) }
+        state.menu?.let { lastMenu = it }
+        AnimatedVisibility(
+            visible = state.menu != null,
+            modifier = Modifier.align(Alignment.CenterEnd),
+            enter = fadeIn(tween(180)) + slideInHorizontally(tween(220)) { it / 3 },
+            exit = fadeOut(tween(150)) + slideOutHorizontally(tween(180)) { it / 3 },
+        ) {
+            lastMenu?.let { MenuPanel(it, onMenuChoice) }
         }
         // Back button for mouse and touch (the remote uses its Back key). Shown with the
-        // channel banner or the VOD controls; not focusable, so the D-pad never lands on it.
+        // channel banner or the controls; not focusable, so the D-pad never lands on it.
         AnimatedVisibility(
-            visible = state.showBanner || state.controlsVisible || state.failed,
+            visible = (state.showBanner || state.controlsVisible || state.failed) && !state.channelList && state.menu == null,
             modifier = Modifier.align(Alignment.TopStart).padding(28.dp),
             enter = fadeIn(),
             exit = fadeOut(),
@@ -162,13 +196,14 @@ fun PlayerOverlay(
                 color = Color.White,
             )
         }
+        // With the channel list open the error moves right, so the list stays usable next to it.
         AnimatedVisibility(
             visible = state.failed,
-            modifier = Modifier.align(Alignment.Center),
+            modifier = if (state.channelList) Modifier.align(Alignment.CenterEnd).padding(end = 40.dp) else Modifier.align(Alignment.Center),
             enter = fadeIn(tween(250)) + scaleIn(tween(300), initialScale = 0.92f),
             exit = fadeOut(tween(200)),
         ) {
-            ErrorPanel(onRetry = onRetry, onBack = onBack)
+            ErrorPanel(live, onRetry = onRetry, onBack = onBack, modifier = Modifier.widthIn(max = 460.dp))
         }
         state.message?.let {
             Text(
@@ -184,52 +219,9 @@ fun PlayerOverlay(
     }
 }
 
-@Composable
-private fun ChannelBanner(item: PlayItem, epg: List<EpgEntry>) {
-    val context = LocalContext.current
-    val timeFormat = android.text.format.DateFormat.getTimeFormat(context)
-    fun range(e: EpgEntry) = "${timeFormat.format(Date(e.start * 1000))} – ${timeFormat.format(Date(e.end * 1000))}"
-
-    Box(
-        Modifier
-            .fillMaxWidth()
-            .background(Brush.verticalGradient(listOf(Color.Transparent, Color(0xEE000000))))
-            .padding(horizontal = 56.dp, vertical = 36.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-            Box(Modifier.size(width = 120.dp, height = 80.dp).clip(RoundedCornerShape(10.dp)).background(Color(0x33FFFFFF))) {
-                AsyncImage(item.logo, null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().padding(8.dp))
-            }
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (item.number > 0) {
-                        Text(item.number.toString(), style = MaterialTheme.typography.headlineSmall, color = Brand.Primary, fontWeight = FontWeight.Bold)
-                    }
-                    Text(item.title, style = MaterialTheme.typography.headlineSmall, color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                val now = epg.getOrNull(0)
-                val next = epg.getOrNull(1)
-                if (now == null) {
-                    Text(stringResource(R.string.epg_none), color = Brand.TextSecondary, style = MaterialTheme.typography.bodyLarge)
-                } else {
-                    Text("${stringResource(R.string.epg_now)}: ${now.title}  ·  ${range(now)}", color = Color.White, style = MaterialTheme.typography.bodyLarge, maxLines = 1)
-                    val total = (now.end - now.start).coerceAtLeast(1)
-                    val elapsed = (System.currentTimeMillis() / 1000 - now.start).coerceIn(0, total)
-                    Box(Modifier.fillMaxWidth(0.6f).height(4.dp).clip(RoundedCornerShape(2.dp)).background(Color(0x44FFFFFF))) {
-                        Box(Modifier.fillMaxWidth(elapsed.toFloat() / total).height(4.dp).background(Brand.Primary))
-                    }
-                    if (next != null) {
-                        Text("${stringResource(R.string.epg_next)}: ${next.title}  ·  ${range(next)}", color = Brand.TextSecondary, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
-                    }
-                }
-            }
-        }
-    }
-}
-
 /** Shown when playback gave up: what happened and what the user can do, by tap or remote. */
 @Composable
-private fun ErrorPanel(onRetry: () -> Unit, onBack: () -> Unit, modifier: Modifier = Modifier) {
+private fun ErrorPanel(live: Boolean, onRetry: () -> Unit, onBack: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier
             .background(Color(0xE6000000), RoundedCornerShape(16.dp))
@@ -242,7 +234,8 @@ private fun ErrorPanel(onRetry: () -> Unit, onBack: () -> Unit, modifier: Modifi
             PanelAction(stringResource(R.string.retry), AppIcons.Replay, primary = true, onClick = onRetry)
             PanelAction(stringResource(R.string.player_back), AppIcons.Back, primary = false, onClick = onBack)
         }
-        Text(stringResource(R.string.player_error_keys), style = MaterialTheme.typography.bodySmall, color = Brand.TextSecondary)
+        Text(stringResource(if (live) R.string.player_error_keys_live else R.string.player_error_keys), style = MaterialTheme.typography.bodySmall,
+            color = Brand.TextSecondary, textAlign = TextAlign.Center)
     }
 }
 

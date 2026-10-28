@@ -22,9 +22,15 @@ Dos entregables, ambos con código fuente 100 % propio: sin licencias de tercero
 4. **Panel y API documentada.** Activar, desactivar y poner vencimiento a equipos; DNS; mensajes a un equipo o a todos;
    varios administradores. Referencia de la API: `panel/docs/API.md`.
 5. **Rebranding y UI moderna para TV.** Nombre, package, panel, colores, logo, ícono y banner en pocos archivos
-   (`android/docs/REBRANDING.md`). Interfaz pensada para control remoto: inicio con accesos grandes, TV en vivo con
-   categorías, favoritos, guía de programación y cambio de canal con el control (flechas, CH+/CH- y números),
-   películas y series con fichas, continuar viendo, reanudación, episodio siguiente automático, búsqueda, español e inglés.
+   (`android/docs/REBRANDING.md`). Interfaz pensada para control remoto, siempre en horizontal: menú lateral (Inicio,
+   Buscar, TV en vivo, Guía TV, Películas, Series, Ajustes); inicio con portada destacada (con vista previa en vivo, sin sonido, del canal enfocado) y filas de continuar viendo,
+   canales, películas y series recientes; TV en vivo en tres columnas con vista previa del canal y programación;
+   guía EPG en cuadrícula por horas; películas y series con fichas; reproductor de películas y series con barra
+   de progreso, audio, subtítulos, velocidad, formato de pantalla y episodio siguiente; reproductor de TV en vivo
+   con banner de programación, lista de canales sobre la imagen, audio, subtítulos (también CC), formato de
+   pantalla y favoritos; cambio de canal con el control (flechas, CH+/CH- y números);
+   ajustes (cuenta, reproducción, tamaño e idioma de subtítulos, contenido, equipo) y control parental con PIN por
+   categoría; búsqueda; español e inglés.
 
 Además, para la revisión de Google Play: proveedor demo integrado en el panel con contenido libre de derechos
 (`panel.premiumplus.lat/demo`) y página de política de privacidad (`panel.premiumplus.lat/privacy.php`).

@@ -40,6 +40,40 @@ class SessionStore(context: Context) {
         get() = prefs.getBoolean("live_hls", false)
         set(value) = prefs.edit { putBoolean("live_hls", value) }
 
+    /** Subtitles at start of playback: "off", or a language code tried first ("es", "en"). */
+    var subtitleLanguage: String
+        get() = prefs.getString("sub_lang", "off")!!
+        set(value) = prefs.edit { putString("sub_lang", value) }
+
+    /** 0 small, 1 normal, 2 large. */
+    var subtitleSize: Int
+        get() = prefs.getInt("sub_size", 1)
+        set(value) = prefs.edit { putInt("sub_size", value) }
+
+    /** Picture format in the player: 0 fit, 1 fill (stretch), 2 zoom (crop). Kept for every channel and movie. */
+    var screenMode: Int
+        get() = prefs.getInt("screen_mode", 0)
+        set(value) = prefs.edit { putInt("screen_mode", value) }
+
+    // ---- Parental control (per device, independent of the account) ----
+
+    var parentalEnabled: Boolean
+        get() = prefs.getBoolean("parental_on", false)
+        set(value) = prefs.edit { putBoolean("parental_on", value) }
+
+    var parentalPin: String
+        get() = prefs.getString("parental_pin", "0000")!!
+        set(value) = prefs.edit { putString("parental_pin", value) }
+
+    /** Locked categories as "live:ID", "vod:ID" or "series:ID". */
+    var lockedCategories: Set<String>
+        get() = prefs.getStringSet("parental_locked", emptySet())!!.toSet()
+        set(value) = prefs.edit { putStringSet("parental_locked", value) }
+
+    fun clearRecents(account: Account) = prefs.edit { remove(recentsKey(account)) }
+
+    fun clearFavorites(account: Account) = prefs.edit { remove(favoritesKey(account)) }
+
     fun isMessageSeen(id: Int): Boolean = id.toString() in prefs.getStringSet("seen_messages", emptySet())!!
 
     fun markMessageSeen(id: Int) {

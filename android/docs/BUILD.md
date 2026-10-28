@@ -60,14 +60,16 @@ app/src/main/java/com/player/tv/
 │   ├── DeviceIdentity.kt   ID estable del dispositivo + clave secreta (no la MAC)
 │   ├── PanelApi.kt         conexión con el panel: activación, DNS, credenciales, mensajes, detección de DNS
 │   ├── XtreamClient.kt     API Xtream Codes: en vivo, películas, series, guía, URLs de reproducción
-│   ├── SessionStore.kt     sesión por ID y sesión manual por separado, favoritos, continuar viendo
+│   ├── SessionStore.kt     sesión por ID y sesión manual por separado, favoritos, continuar viendo, preferencias
+│   ├── Parental.kt         control parental: categorías bloqueadas con PIN
 │   └── Graph.kt            dependencias y sesión actual
 └── ui/
     ├── splash/ activation/ login/      inicio, pantalla del ID, ingreso manual
-    ├── home/ live/ vod/ series/        inicio y contenido
-    ├── search/ settings/
-    ├── player/                         reproductor ExoPlayer (Media3), cambio de canal, guía
-    ├── components/                     componentes de TV reutilizables
+    ├── home/ live/ vod/ series/        inicio y contenido (TV en vivo con vista previa)
+    ├── guide/                          guía EPG en cuadrícula
+    ├── search/ settings/               búsqueda; ajustes y control parental
+    ├── player/                         reproductor ExoPlayer (Media3): controles de película y de TV en vivo, lista de canales, audio, subtítulos, velocidad, formato de pantalla
+    ├── components/                     menú lateral, PIN y componentes de TV reutilizables
     └── theme/                          paleta de colores de la marca
 ```
 

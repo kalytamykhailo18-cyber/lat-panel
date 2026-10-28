@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Border
 import androidx.tv.material3.Card
 import androidx.tv.material3.Glow
+import androidx.tv.material3.Icon
 import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.MaterialTheme
@@ -99,6 +100,7 @@ fun CategoryColumn(
     selectedId: String?,
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
+    isLocked: (String) -> Boolean = { false },
 ) {
     val state = rememberLazyListState()
     val selectedFocus = remember { FocusRequester() }
@@ -143,14 +145,17 @@ fun CategoryColumn(
                     focusedSelectedContentColor = Color.White,
                 ),
             ) {
-                Text(
-                    label,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Row(Modifier.padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        label,
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    if (isLocked(id)) Icon(AppIcons.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
+                }
             }
         }
     }
@@ -192,6 +197,7 @@ fun ChannelRow(
     onLongClick: () -> Unit,
     onFocused: () -> Unit,
     modifier: Modifier = Modifier,
+    playing: Boolean = false,
 ) {
     Surface(
         onClick = onClick,
@@ -216,7 +222,9 @@ fun ChannelRow(
             Box(Modifier.size(width = 56.dp, height = 36.dp).clip(RoundedCornerShape(4.dp)).background(Color(0x22FFFFFF))) {
                 AsyncImage(model = logo, contentDescription = null, contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize().padding(2.dp))
             }
-            Text(name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(name, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                fontWeight = if (playing) FontWeight.SemiBold else FontWeight.Normal)
+            if (playing) Icon(AppIcons.Play, contentDescription = null, modifier = Modifier.size(18.dp))
             if (favorite) Text("★", color = Color(0xFFFFC94D), style = MaterialTheme.typography.titleMedium)
         }
     }

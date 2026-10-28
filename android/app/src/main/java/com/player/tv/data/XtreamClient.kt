@@ -1,6 +1,8 @@
 package com.player.tv.data
 
 import android.util.Base64
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
@@ -56,8 +58,11 @@ class XtreamClient(private val http: OkHttpClient, val account: Account, initial
             .sortedBy { it.number }
     }
 
-    suspend fun shortEpg(streamId: Int): List<EpgEntry> =
-        (call("get_short_epg", mapOf("stream_id" to streamId.toString(), "limit" to "2")) as? JsonObject)
+    suspend fun shortEpg(streamId: Int): List<EpgEntry> = epg(streamId, 2)
+
+    /** Upcoming programs from now on (the current one first); used by the guide grid. */
+    suspend fun epg(streamId: Int, limit: Int): List<EpgEntry> =
+        (call("get_short_epg", mapOf("stream_id" to streamId.toString(), "limit" to limit.toString())) as? JsonObject)
             ?.arr("epg_listings")?.objects().orEmpty()
             .mapNotNull { o ->
                 val start = o.long("start_timestamp") ?: return@mapNotNull null
@@ -166,12 +171,13 @@ class XtreamClient(private val http: OkHttpClient, val account: Account, initial
     private fun parseMovie(o: JsonObject): Movie? {
         val id = o.int("stream_id") ?: return null
         return Movie(id, o.str("name") ?: "#$id", o.str("stream_icon"), o.str("rating"), o.str("category_id"),
-            o.str("container_extension") ?: "mp4")
+            o.str("container_extension") ?: "mp4", o.long("added") ?: 0)
     }
 
     private fun parseSeries(o: JsonObject): Series? {
         val id = o.int("series_id") ?: return null
-        return Series(id, o.str("name") ?: "#$id", o.str("cover"), o.str("rating"), o.str("category_id"))
+        return Series(id, o.str("name") ?: "#$id", o.str("cover"), o.str("rating"), o.str("category_id"),
+            o.long("last_modified") ?: 0, o.str("plot"))
     }
 
     private suspend fun call(action: String?, params: Map<String, String> = emptyMap()): JsonElement {
@@ -187,7 +193,7 @@ class XtreamClient(private val http: OkHttpClient, val account: Account, initial
         val body = http.fetch(Request.Builder().url(url).build())
         if (body.isBlank()) throw AppException(if (action == null) AppException.Kind.AUTH else AppException.Kind.SERVER)
         return try {
-            parseJson(body)
+            withContext(Dispatchers.Default) { parseJson(body) }   // full catalogs can be megabytes
         } catch (e: SerializationException) {
             throw AppException(if (action == null) AppException.Kind.AUTH else AppException.Kind.SERVER, "Invalid JSON", e)
         }
@@ -204,7 +210,7 @@ class XtreamClient(private val http: OkHttpClient, val account: Account, initial
 
     @Suppress("UNCHECKED_CAST")
     private suspend fun <T : Any> cached(key: String, load: suspend () -> T): T =
-        cache[key] as? T ?: load().also { cache[key] = it }
+        cache[key] as? T ?: withContext(Dispatchers.Default) { load() }.also { cache[key] = it }
 
     private fun decodeBase64(text: String?): String? =
         text?.let { runCatching { String(Base64.decode(it, Base64.DEFAULT)) }.getOrDefault(it) }?.trim()?.takeIf { it.isNotEmpty() }

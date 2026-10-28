@@ -13,6 +13,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.player.tv.ui.activation.ActivationScreen
+import com.player.tv.ui.components.MainShell
+import com.player.tv.ui.guide.GuideScreen
 import com.player.tv.ui.home.HomeScreen
 import com.player.tv.ui.live.LiveScreen
 import com.player.tv.ui.login.ManualLoginScreen
@@ -36,6 +38,7 @@ object Routes {
     const val SERIES_DETAIL = "series/{id}"
     const val SEARCH = "search"
     const val SETTINGS = "settings"
+    const val GUIDE = "guide"
 
     fun movie(id: Int) = "movie/$id"
     fun seriesDetail(id: Int) = "series/$id"
@@ -45,6 +48,15 @@ object Routes {
 fun AppNavHost(nav: NavHostController, app: AppViewModel) {
     // Replaces the whole back stack, e.g. after signing in or out.
     fun resetTo(route: String) = nav.navigate(route) { popUpTo(0) { inclusive = true } }
+
+    // Side menu: sections sit directly above Home, so Back from any section returns Home.
+    fun openSection(route: String) {
+        if (route == Routes.HOME) nav.popBackStack(Routes.HOME, inclusive = false)
+        else nav.navigate(route) {
+            popUpTo(Routes.HOME)
+            launchSingleTop = true
+        }
+    }
 
     // Forward: new screen fades in sliding slightly from the right; back: the reverse.
     NavHost(
@@ -76,25 +88,28 @@ fun AppNavHost(nav: NavHostController, app: AppViewModel) {
                 app.startMonitor()
                 onDispose { }
             }
-            HomeScreen(onOpen = { nav.navigate(it) })
+            MainShell(Routes.HOME, ::openSection) { HomeScreen(onOpen = { nav.navigate(it) }) }
         }
-        composable(Routes.LIVE) { LiveScreen() }
-        composable(Routes.MOVIES) { MoviesScreen(onOpenMovie = { nav.navigate(Routes.movie(it)) }) }
+        composable(Routes.LIVE) { MainShell(Routes.LIVE, ::openSection) { LiveScreen() } }
+        composable(Routes.GUIDE) { MainShell(Routes.GUIDE, ::openSection) { GuideScreen() } }
+        composable(Routes.MOVIES) { MainShell(Routes.MOVIES, ::openSection) { MoviesScreen(onOpenMovie = { nav.navigate(Routes.movie(it)) }) } }
         composable(Routes.MOVIE, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
             MovieDetailScreen(movieId = entry.arguments!!.getInt("id"))
         }
-        composable(Routes.SERIES) { SeriesScreen(onOpenSeries = { nav.navigate(Routes.seriesDetail(it)) }) }
+        composable(Routes.SERIES) { MainShell(Routes.SERIES, ::openSection) { SeriesScreen(onOpenSeries = { nav.navigate(Routes.seriesDetail(it)) }) } }
         composable(Routes.SERIES_DETAIL, arguments = listOf(navArgument("id") { type = NavType.IntType })) { entry ->
             SeriesDetailScreen(seriesId = entry.arguments!!.getInt("id"))
         }
         composable(Routes.SEARCH) {
-            SearchScreen(
-                onOpenMovie = { nav.navigate(Routes.movie(it)) },
-                onOpenSeries = { nav.navigate(Routes.seriesDetail(it)) },
-            )
+            MainShell(Routes.SEARCH, ::openSection) {
+                SearchScreen(
+                    onOpenMovie = { nav.navigate(Routes.movie(it)) },
+                    onOpenSeries = { nav.navigate(Routes.seriesDetail(it)) },
+                )
+            }
         }
         composable(Routes.SETTINGS) {
-            SettingsScreen(
+            MainShell(Routes.SETTINGS, ::openSection) { SettingsScreen(
                 onSwitchToManual = {
                     app.stopMonitor()
                     nav.navigate(Routes.LOGIN)
@@ -103,7 +118,7 @@ fun AppNavHost(nav: NavHostController, app: AppViewModel) {
                     app.stopMonitor()
                     resetTo(Routes.ACTIVATION)
                 },
-            )
+            ) }
         }
     }
 }
